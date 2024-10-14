@@ -15,8 +15,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\Common\Template.Trunk.Shared\Template.Trunk.Shared.csproj" />
     <ProjectReference Include="..\Template.Trunk.Application\Template.Trunk.Server.Application.csproj" />
-    <ProjectReference Include="..\Template.Trunk.Shared\Template.Trunk.Shared.csproj" />
   </ItemGroup>
 
 </Project>
