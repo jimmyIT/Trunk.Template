@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Template.Trunk.Data.Entities.UserSession;
+using Template.Trunk.Data.Entities.WsReqResp;
 
-namespace Template.Trunk.Data.EntityTypeConfigurations.UserSession;
+namespace Template.Trunk.Data.EntityTypeConfigurations.WsReqResp;
 
-public class UserSessionTypeConfiguration : IEntityTypeConfiguration<UserSessionEntity>
+public class WsReqRespConfiguration : IEntityTypeConfiguration<WsReqRespEntity>
 {
-    public void Configure(EntityTypeBuilder<UserSessionEntity> builder)
+    public void Configure(EntityTypeBuilder<WsReqRespEntity> builder)
     {
         builder.HasKey(u => u.Id);
         builder.HasIndex(u => u.Id).IsUnique();
@@ -18,9 +18,9 @@ public class UserSessionTypeConfiguration : IEntityTypeConfiguration<UserSession
                .HasMaxLength(100)
                .IsRequired();
 
-        builder.HasOne(u => u.User)
-            .WithMany(u => u.UserSessions)
-            .HasForeignKey(us => us.UserCode)
+        builder.HasOne(u => u.MessageDefinition)
+            .WithMany(u => u.WsReqResps)
+            .HasForeignKey(us => us.MessageDefinitionCode)
             .HasPrincipalKey(u => u.Code)
             .OnDelete(DeleteBehavior.Cascade);
 

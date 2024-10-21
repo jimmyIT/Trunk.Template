@@ -1,12 +1,12 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using Template.Trunk.Data.Entities.User;
+using Template.Trunk.Data.Entities.UserSession;
 
-namespace Template.Trunk.Data.EntityTypeConfigurations.User;
+namespace Template.Trunk.Data.EntityTypeConfigurations.UserSession;
 
-public class UserTypeConfiguration : IEntityTypeConfiguration<UserEntity>
+public class UserSessionConfiguration : IEntityTypeConfiguration<UserSessionEntity>
 {
-    public void Configure(EntityTypeBuilder<UserEntity> builder)
+    public void Configure(EntityTypeBuilder<UserSessionEntity> builder)
     {
         builder.HasKey(u => u.Id);
         builder.HasIndex(u => u.Id).IsUnique();
@@ -18,9 +18,11 @@ public class UserTypeConfiguration : IEntityTypeConfiguration<UserEntity>
                .HasMaxLength(100)
                .IsRequired();
 
-        builder.Property(e => e.CreatedOn)
-               //.HasDefaultValue(DateTime.UtcNow)
-               .IsRequired();
+        builder.HasOne(u => u.User)
+            .WithMany(u => u.UserSessions)
+            .HasForeignKey(us => us.UserCode)
+            .HasPrincipalKey(u => u.Code)
+            .OnDelete(DeleteBehavior.Cascade);
 
         builder.Property(g => g.Timestamp)
                .IsRowVersion();
