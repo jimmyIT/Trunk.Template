@@ -5,6 +5,7 @@ using Template.Trunk.Shared.Constants.OpenAPI;
 namespace Template.Trunk.OpenAPI.Controllers.Version_1.User;
 
 [ApiExplorerSettings(GroupName = ApiSettingsConst.Tag.User)]
+[ApiVersion(ApiSettingsConst.Version.V1_0)]
 public class BaseUserController : BaseApiController
 {
 }

@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Identity;
+using Template.Trunk.Server.Application.Handlers.Users.GenerateToken;
 using Template.Trunk.Shared.Cryptography;
 
 namespace Template.Trunk.OpenAPI.Extension
@@ -9,6 +10,8 @@ namespace Template.Trunk.OpenAPI.Extension
         {
             services.AddScoped<IPasswordHasher<object>, PasswordHasher<object>>();
             services.AddScoped<IHasher, Hasher>();
+
+            services.AddScoped<IGenerateUserTokenHandler, GenerateUserTokenHandler>();
         }
 
         public static void ResolveSingletonServices(this IServiceCollection services)
