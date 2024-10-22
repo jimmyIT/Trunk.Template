@@ -1,7 +1,11 @@
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json.Serialization;
 using Template.Trunk.Data.DbContexts;
+using Template.Trunk.OpenAPI.Controllers;
 using Template.Trunk.OpenAPI.Extension;
+
+[assembly: ApiConventionType(typeof(ApiConvention))]
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -22,12 +26,13 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 var app = builder.Build();
 
+app.UseAuthentication();
+app.UseAuthorization();
+
 bool isDevelopment = app.Environment.IsDevelopment();
 app.UseCustomSwagger(isDevelopment);
 
 app.UseHttpsRedirection();
-
-app.UseAuthorization();
 
 app.MapControllers();
 

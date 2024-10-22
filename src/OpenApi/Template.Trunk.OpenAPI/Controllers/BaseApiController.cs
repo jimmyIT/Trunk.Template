@@ -29,9 +29,9 @@ namespace Template.Trunk.OpenAPI.Controllers
             };
         }
 
-        ActionResult Ok200Async(object? response) => Ok(response);
-        ActionResult BadRequest400Async(object? response) => BadRequest(response);
-        ActionResult Created201Async(object? response) => StatusCode((int)HttpStatusCode.Created, response);
+        ActionResult Ok200Async(object? responseData) => Ok(responseData);
+        ActionResult BadRequest400Async(object? responseErrors) => BadRequest(responseErrors);
+        ActionResult Created201Async(object? responseData) => StatusCode((int)HttpStatusCode.Created, responseData);
         ActionResult NoContent204Async() => NoContent();
     }
 }

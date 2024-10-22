@@ -21,5 +21,11 @@ public struct ActionInfoConst
             public const string Code = "USER003";
             public const string Description = "Revoke Token";
         }
+
+        public struct GetByCode
+        {
+            public const string Code = "USER004";
+            public const string Description = "Get user by code";
+        }
     }
 }

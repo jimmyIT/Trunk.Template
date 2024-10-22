@@ -3,11 +3,13 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Mvc.Controllers;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Polly;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using System.Reflection;
 using System.Text;
 using Template.Trunk.Server.Application.Common.Constants;
+using Template.Trunk.Server.Application.Common.Domain;
 using Template.Trunk.Server.Application.Common.Domain.AppSettings;
 using Template.Trunk.Shared.Constants.OpenAPI;
 
@@ -26,13 +28,20 @@ namespace Template.Trunk.OpenAPI.Extension
             services.Configure<List<SwaggerDocSettings>>(jwtConfigSection);
 
             JWTSettings? jwtConfigs = jwtConfigSection.Get<JWTSettings>();
+            if (jwtConfigs == null || string.IsNullOrEmpty(jwtConfigs.Key))
+            {
+                throw new Exception("Missing JWT Key");
+            }
 
             List<SwaggerDocSettings>? swaggerDocConfigs = swaggerDocSection.Get<List<SwaggerDocSettings>>();
             if (swaggerDocConfigs == null || swaggerDocConfigs.Count == 0)
                 throw new Exception("Failed to get config settings.");
 
             services.AddEndpointsApiExplorer();
-            services.AddSwaggerGen(c => {
+
+            services.AddSwaggerGen(c =>
+            {
+                c.EnableAnnotations();
                 c.OrderActionsBy((apiDesc) => $"{apiDesc.ActionDescriptor.RouteValues["controller"]}_{apiDesc.HttpMethod}");
                 c.TagActionsBy(api =>
                 {
@@ -46,6 +55,7 @@ namespace Template.Trunk.OpenAPI.Extension
                     }
                     throw new InvalidOperationException("Unable to determine tag for endpoint.");
                 });
+
                 c.DocInclusionPredicate((name, api) => true);
 
                 foreach (var item in swaggerDocConfigs)
@@ -53,26 +63,54 @@ namespace Template.Trunk.OpenAPI.Extension
                     OpenApiInfoSettings? openAPIInfoConfigs = item?.OpenApiInfo;
                     OpenApiContactSettings? openAPIContactConfigs = item?.OpenApiContact;
                     OpenApiLicenseSettings? openAPILiecenseConfigs = item?.OpenApiLicense;
-                    c.SwaggerDoc(item?.Name,
-                    new OpenApiInfo
-                    {
-                        Title = openAPIInfoConfigs?.Title,
-                        Version = openAPIInfoConfigs?.Version,
-                        Description = item?.Description,
-                        TermsOfService = new Uri(item?.TermsOfServiceUrl ?? "https://example.com/terms"),
-                        Contact = new OpenApiContact
+                    c.SwaggerDoc(
+                        item?.Name,
+                        new OpenApiInfo
                         {
-                            Name = openAPIContactConfigs?.Name,
-                            Email = openAPIContactConfigs?.Email,
-                            Url = new Uri(openAPIContactConfigs?.Url ?? "https://example.com/phuong.vt5614"),
-                        },
-                        License = new OpenApiLicense
-                        {
-                            Name = openAPILiecenseConfigs?.Name,
-                            Url = new Uri(openAPILiecenseConfigs?.Url ?? "https://example.com/license"),
-                        }
-                    });
+                            Title = openAPIInfoConfigs?.Title,
+                            Version = openAPIInfoConfigs?.Version,
+                            Description = item?.Description,
+                            TermsOfService = new Uri(item?.TermsOfServiceUrl ?? "https://example.com/terms"),
+                            Contact = new OpenApiContact
+                            {
+                                Name = openAPIContactConfigs?.Name,
+                                Email = openAPIContactConfigs?.Email,
+                                Url = new Uri(openAPIContactConfigs?.Url ?? "https://example.com/phuong.vt5614"),
+                            },
+                            License = new OpenApiLicense
+                            {
+                                Name = openAPILiecenseConfigs?.Name,
+                                Url = new Uri(openAPILiecenseConfigs?.Url ?? "https://example.com/license"),
+                            },
+                        });
                 }
+
+                // Add a security definition for Bearer token
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Description = "Enter your Bearer token in the format **Bearer {your token}**",
+                    Type = SecuritySchemeType.Http,
+                    Scheme = "bearer",
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header,
+                    Name = "Authorization",
+                });
+
+                // Add a security requirement
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] {}
+                    }
+                });
 
                 c.DocInclusionPredicate((docName, apiDesc) =>
                 {
@@ -86,18 +124,71 @@ namespace Template.Trunk.OpenAPI.Extension
                 });
             });
 
+            services.AddAuthentication(options =>
+            {
+                options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                options.DefaultForbidScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+                    {
+                        options.ForwardDefaultSelector = context =>
+                        {
+                            string authorization = context.Request.Headers.Authorization;
+                            return authorization?.Contains(ApiKeyConst.AuthenticationScheme, StringComparison.OrdinalIgnoreCase) is true ? ApiKeyConst.AuthenticationScheme : null;
+                        };
 
-            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-                            .AddJwtBearer(options =>
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            ValidateIssuerSigningKey = true,
+                            ValidateIssuer = true,
+                            ValidateAudience = true,
+                            ValidateLifetime = true,
+                            ValidIssuer = jwtConfigs.Issuer,
+                            ValidAudience = jwtConfigs.Audience,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfigs.Key)),
+                        };
+
+                        options.Events = new JwtBearerEvents
+                        {
+                            OnChallenge = context =>
                             {
-                                options.TokenValidationParameters = new TokenValidationParameters
+                                if (context.AuthenticateFailure == null &&
+                                context.Error == null &&
+                                context.ErrorDescription == null &&
+                                context.ErrorUri == null)
                                 {
-                                    ValidateIssuerSigningKey = true,
-                                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtConfigs?.Key ?? string.Empty)),
-                                    ValidateIssuer = false,
-                                    ValidateAudience = false
+                                    context.HandleResponse();
+                                }
+                                else
+                                {
+                                    // Handle authentication failure (e.g., invalid token).
+                                    context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+                                    context.Response.ContentType = "application/json";
+                                    var errorResponse = new ErrorMessage()
+                                    {
+                                        Code = "401",
+                                        Message = "Unauthorized - You are not authorized to access this resource."
+                                    };
+
+                                    return context.Response.WriteAsJsonAsync(errorResponse);
+                                }
+
+                                return Task.CompletedTask;
+                            },
+                            OnForbidden = context =>
+                            {
+                                context.Response.StatusCode = StatusCodes.Status403Forbidden;
+                                context.Response.ContentType = "application/json";
+                                var errorResponse = new ErrorMessage()
+                                {
+                                    Code = "403",
+                                    Message = "Forbidden - You do not have permission to access this resource."
                                 };
-                            });
+
+                                return context.Response.WriteAsJsonAsync(errorResponse);
+                            },
+                        };
+                    });
 
             services.AddApiVersioning(options =>
             {
@@ -114,7 +205,7 @@ namespace Template.Trunk.OpenAPI.Extension
                 options.SubstituteApiVersionInUrl = true;
             });
         }
-    
+
         public static void UseCustomSwagger(this IApplicationBuilder app, bool isDevelopment)
         {
             // Configure the HTTP request pipeline.
