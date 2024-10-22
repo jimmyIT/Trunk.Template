@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Template.Trunk.Data.DbContexts;
 
@@ -11,9 +12,11 @@ using Template.Trunk.Data.DbContexts;
 namespace Template.Trunk.Data.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241022021636_UpdateEntity")]
+    partial class UpdateEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -140,12 +143,12 @@ namespace Template.Trunk.Data.Migrations
                         new
                         {
                             Id = 1,
-                            Code = "FHEHT57172",
-                            CreateBy = "FHEHT57172",
-                            CreatedOn = new DateTime(2024, 10, 22, 9, 19, 28, 391, DateTimeKind.Local).AddTicks(5101),
+                            Code = "NSGRI53511",
+                            CreateBy = "NSGRI53511",
+                            CreatedOn = new DateTime(2024, 10, 22, 9, 16, 34, 495, DateTimeKind.Local).AddTicks(1248),
                             EmailAddress = "jimmy.vtp94@gmail.com",
                             Name = "Aministrator",
-                            PasswordHash = "AQAAAAIAAYagAAAAEN/ACUl8jIvKQO4wxXNeYLcldk+sWQGW6qrmu1VgctCLIHNbgFIEJ0VL6UKD6TjESg=="
+                            PasswordHash = "AQAAAAIAAYagAAAAEOEec7nib/qeN997cOoOqI/F9RfPhl+ydhm8RW41y1Gf9hcLtH+3OongO3SXhlflkw=="
                         });
                 });
 

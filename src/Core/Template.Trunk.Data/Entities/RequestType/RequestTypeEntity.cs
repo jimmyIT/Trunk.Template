@@ -12,5 +12,5 @@ public class RequestTypeEntity : IBaseEntity
     public byte[]? Timestamp { get; set; }
 
     // Navigation Property
-    public ICollection<WsReqRespEntity> WsReqResps { get; set; } = [];
+    public virtual ICollection<WsReqRespEntity> WsReqResps { get; set; } = [];
 }

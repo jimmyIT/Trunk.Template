@@ -24,5 +24,5 @@ public class WsReqRespEntity : IBaseEntity
 
     public string MessageDefinitionCode { get; set; } = default!;
     // Navigation Property
-    public RequestTypeEntity MessageDefinition { get; set; } = default!;
+    public virtual RequestTypeEntity MessageDefinition { get; set; } = default!;
 }

@@ -20,5 +20,5 @@ public class UserEntity : IBaseEntityDetails
     public byte[]? Timestamp { get; set; }
     
     // Navigation Property
-    public ICollection<UserSessionEntity> UserSessions { get; set; } = [];
+    public virtual ICollection<UserSessionEntity> UserSessions { get; set; } = [];
 }

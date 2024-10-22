@@ -18,6 +18,6 @@ namespace Template.Trunk.Data.Entities.UserSession
         public string UserCode { get; set; } = default!;
 
         // Navigation Property
-        public UserEntity User { get; set; } = default!;
+        public virtual UserEntity User { get; set; } = default!;
     }
 }
