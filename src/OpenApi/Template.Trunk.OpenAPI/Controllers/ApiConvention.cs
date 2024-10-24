@@ -10,6 +10,7 @@ public static class ApiConvention
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(IList<ErrorMessage>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorMessage))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Get()
@@ -18,6 +19,7 @@ public static class ApiConvention
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(IList<ErrorMessage>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorMessage))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
@@ -30,6 +32,7 @@ public static class ApiConvention
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(IList<ErrorMessage>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status404NotFound, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorMessage))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
@@ -45,6 +48,7 @@ public static class ApiConvention
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(IList<ErrorMessage>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorMessage))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Search(
@@ -56,6 +60,7 @@ public static class ApiConvention
 
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest, Type = typeof(IList<ErrorMessage>))]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized, Type = typeof(ErrorMessage))]
     [ProducesResponseType(StatusCodes.Status500InternalServerError, Type = typeof(ErrorMessage))]
     [ApiConventionNameMatch(ApiConventionNameMatchBehavior.Prefix)]
     public static void Filter(

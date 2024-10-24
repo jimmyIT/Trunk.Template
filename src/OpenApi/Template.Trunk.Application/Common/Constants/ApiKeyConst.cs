@@ -2,6 +2,8 @@
 
 public struct ApiKeyConst
 {
-    public const string AuthenticationScheme = "ApiKey";
-    public const string HeaderPrefix = $"ApiKey";
+    public const string AuthenticationApiKeyScheme = "ApiKey";
+    public const string HeaderApiKeyPrefix = $"ApiKey";
+    public const string AuthenticationBearerScheme = "Bearer";
+    public const string HeaderBearerPrefix = $"ApiKey";
 }
